@@ -4,8 +4,8 @@ use sqlx::{Executor, SqlitePool};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Molecule {
-    atomic_numbers: Vec<u8>,
-    atom_charges: Option<Vec<i8>>,
+    pub atomic_numbers: Vec<u8>,
+    pub atom_charges: Option<Vec<i8>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
