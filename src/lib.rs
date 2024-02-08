@@ -3,9 +3,31 @@ use serde_json::{Map, Value};
 use sqlx::{Executor, SqlitePool};
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct Bonds {
+    pub atom1: Vec<u32>,
+    pub atom2: Vec<u32>,
+    pub order: Vec<u8>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AromaticBonds {
+    pub atom1: Vec<u32>,
+    pub atom2: Vec<u32>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Molecule {
     pub atomic_numbers: Vec<u8>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub atom_charges: Option<Vec<i8>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bonds: Option<Bonds>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub dative_bonds: Option<Bonds>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub aromatic_bonds: Option<AromaticBonds>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub conformers: Option<Vec<Vec<[f32; 3]>>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -98,6 +120,18 @@ mod tests {
                         molecule: Molecule {
                             atomic_numbers: vec![1, 2, 3],
                             atom_charges: Some(vec![0, 0, 0]),
+                            bonds: Some(Bonds {
+                                atom1: vec![0, 1],
+                                atom2: vec![1, 2],
+                                order: vec![1, 2],
+                            }),
+                            dative_bonds: None,
+                            aromatic_bonds: None,
+                            conformers: Some(vec![vec![
+                                [0.0, 0.0, 0.0],
+                                [1.0, 1.0, 1.0],
+                                [2.0, 2.0, 2.0],
+                            ]]),
                         },
                         properties: map! {
                             "density": 1.0,
@@ -109,6 +143,13 @@ mod tests {
                         molecule: Molecule {
                             atomic_numbers: vec![4, 5],
                             atom_charges: None,
+                            bonds: None,
+                            dative_bonds: None,
+                            aromatic_bonds: Some(AromaticBonds {
+                                atom1: vec![0, 1],
+                                atom2: vec![1, 2],
+                            }),
+                            conformers: Some(vec![vec![[0.0, 0.0, 0.0], [1.0, 1.0, 1.0]]]),
                         },
                         properties: map! {
                             "density": 2.0,
